@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rl_root">
+
+    <TextView
+        android:id="@+id/tv_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Small"
+        android:textSize="25sp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="50dp"/>
+    <Button
+        android:id="@+id/btn_switch_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Large"
+        android:textAllCaps="false"
+        android:layout_alignBaseline="@id/tv_size"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="25dp">
+    </Button>
+    <ImageView
+        android:id="@+id/iv_canvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btn_switch_size"
+        android:layout_above="@id/btn_proceed">
+    </ImageView>
+    <Button
+        android:id="@+id/btn_proceed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Proceed"
+        android:textAllCaps="false"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+    </Button>
+
+</RelativeLayout>

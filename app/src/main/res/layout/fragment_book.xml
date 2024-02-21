@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tv_dari"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="From"
+            android:textSize="30sp"
+            android:layout_marginTop="30dp"
+            android:textColor="@color/dark_blue"
+            android:layout_marginLeft="30dp"/>
+        <Spinner
+            android:id="@+id/sp_dari"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_dari"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_ke"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="To"
+            android:textSize="30sp"
+            android:layout_marginTop="30dp"
+            android:layout_below="@id/sp_dari"
+            android:textColor="@color/dark_blue"
+            android:layout_marginLeft="30dp"/>
+        <Spinner
+            android:id="@+id/sp_ke"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_ke"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_ukuran"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vehicle Size"
+            android:textSize="30sp"
+            android:layout_marginTop="30dp"
+            android:layout_below="@id/sp_ke"
+            android:textColor="@color/dark_blue"
+            android:layout_marginLeft="30dp"/>
+        <Spinner
+            android:id="@+id/sp_ukuran"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_ukuran"
+            android:layout_below="@id/sp_ke"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="30dp"/>
+
+        <TextView
+            android:id="@+id/tv_tanggal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textSize="30sp"
+            android:layout_marginTop="30dp"
+            android:layout_below="@id/tv_ukuran"
+            android:textColor="@color/dark_blue"
+            android:layout_marginLeft="30dp"/>
+        <TextView
+            android:id="@+id/tV_pilihan_tanggal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_toRightOf="@id/tv_tanggal"
+            android:layout_alignBaseline="@id/tv_tanggal"
+            android:textColor="@color/black"
+            android:layout_marginLeft="100dp"/>
+        <Button
+            android:id="@+id/btn_tanggal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pick Date"
+            android:layout_below="@id/tv_tanggal"
+            android:textAllCaps="false"
+            android:layout_marginLeft="30dp"
+            android:backgroundTint="@color/gray_blue"/>
+
+        <TextView
+            android:id="@+id/tv_waktu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textSize="30sp"
+            android:textColor="@color/dark_blue"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_below="@id/btn_tanggal"/>
+        <TextView
+            android:id="@+id/tV_pilihan_waktu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_toRightOf="@id/tv_waktu"
+            android:layout_alignBaseline="@id/tv_waktu"
+            android:textColor="@color/black"
+            android:layout_marginLeft="100dp"/>
+        <Button
+            android:id="@+id/btn_waktu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pick Time"
+            android:layout_below="@id/tv_waktu"
+            android:textAllCaps="false"
+            android:layout_marginLeft="30dp"
+            android:backgroundTint="@color/gray_blue"/>
+
+        <Button
+            android:id="@+id/btn_cari"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Find"
+            android:layout_below="@id/btn_waktu"
+            android:textAllCaps="false"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="@color/gray_blue"/>
+
+    </RelativeLayout>
+</ScrollView>
