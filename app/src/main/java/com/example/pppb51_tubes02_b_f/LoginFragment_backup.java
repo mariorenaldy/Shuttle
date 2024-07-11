@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+
 import com.example.pppb51_tubes02_b_f.databinding.FragmentLoginBinding;
 import com.google.android.material.navigation.NavigationView;
 
@@ -21,7 +22,7 @@ import java.io.FileWriter;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class LoginFragment extends Fragment implements View.OnClickListener, IConnectFragment, ILoginFragment {
+public class LoginFragment_backup extends Fragment implements View.OnClickListener, IConnectFragment, ILoginFragment{
     private FragmentLoginBinding binding;
     public static String ACCESS_TOKEN = "";
     private LoginPresenter presenter;
@@ -32,8 +33,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, ICo
         binding = FragmentLoginBinding.inflate(inflater);
         binding.btnLogin.setOnClickListener(this);
 
-        ((ControlActivity) getActivity()).lockDrawer();
-        ((ControlActivity) getActivity()).getSupportActionBar().hide();
+        ((ControlActivity)getActivity()).lockDrawer();
+        ((ControlActivity)getActivity()).getSupportActionBar().hide();
 
         presenter = new LoginPresenter(this, this);
 
@@ -43,7 +44,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, ICo
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onClick(View view) {
-        if (view == binding.btnLogin) {
+        if(view == binding.btnLogin){
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
 
@@ -58,9 +59,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, ICo
         LoginResult result = (LoginResult) response;
         ACCESS_TOKEN = result.getToken();
 
-        // Save token to cache
+        //save token to cache
         File tokenFile = new File(getContext().getCacheDir(), "token.txt");
-        if (tokenFile.exists()) {
+        if(tokenFile.exists()){
             tokenFile.delete();
         }
         try {
@@ -68,7 +69,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, ICo
             writer.append(ACCESS_TOKEN);
             writer.flush();
             writer.close();
-        } catch (Exception e) {
+        } catch (Exception e){
             e.printStackTrace();
         }
 
@@ -82,11 +83,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, ICo
     @Override
     public void onError(String error) {
         String message = "";
-        if (error.equals("E_INV_CRED")) {
+        if(error.equals("E_INV_CRED")){
             message = "Invalid username \n or password!";
-        } else if (error.equals("E_INV_USERNAME")) {
+        }
+        else if(error.equals("E_INV_USERNAME")){
             message = "Please insert a valid \n username!";
-        } else if (error.equals("E_INV_PASSWORD")) {
+        }
+        else if(error.equals("E_INV_PASSWORD")){
             message = "Please insert a valid \n password!";
         }
         new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE)

@@ -27,8 +27,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -43,9 +44,14 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
     private Paint paint;
     private SmallSeatPresenter presenter;
     private HashMap<String, String> bookInfo;
-    private ArrayList<String> occupied;
+    private Set<String> occupied;
 
-    @Nullable
+    private String source;
+    private String destination;
+    private String date;
+    private String time;
+    private String vehicleSize;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentSmallSeatBinding.inflate(inflater);
@@ -56,17 +62,14 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
 
         presenter = new SmallSeatPresenter(this, this);
         Sensey.getInstance().init(getContext(), Sensey.SAMPLING_PERIOD_UI);
-        ShakeDetector.ShakeListener shakeListener=new ShakeDetector.ShakeListener() {
-            @Override public void onShakeDetected() {
-
-            }
+        ShakeDetector.ShakeListener shakeListener = new ShakeDetector.ShakeListener() {
+            @Override public void onShakeDetected() {}
 
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onShakeStopped() {
                 switchSize();
             }
-
         };
 
         Sensey.getInstance().startShakeDetection(shakeListener);
@@ -76,9 +79,15 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
         Bundle args = getArguments();
         if (args != null){
             bookInfo = (HashMap<String, String>) args.getSerializable("bookInfo");
-            String str = bookInfo.get("occupied");
-            occupied = new ArrayList<>(Arrays.asList(str.split(",")));
+            source = bookInfo.get("source");
+            destination = bookInfo.get("destination");
+            date = bookInfo.get("date");
+            time = bookInfo.get("hour");
+            vehicleSize = bookInfo.get("vehicle");
         }
+
+        // Load booked seats based on trip details
+        loadBookedSeats();
 
         binding.rlRoot.post(new Runnable() {
             @Override
@@ -90,6 +99,7 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
         ivCanvas.setOnTouchListener(this);
         return binding.getRoot();
     }
+
     public static SmallSeatFragment newInstance(HashMap<String,String> bookInfo) {
         SmallSeatFragment fragment = new SmallSeatFragment();
         Bundle args = new Bundle();
@@ -123,6 +133,7 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
                         .show();
             }
             else{
+                saveBookedSeats();
                 getParentFragmentManager().beginTransaction().setCustomAnimations(R.anim.fade_in, R.anim.slide_out)
                         .replace(R.id.fragment_container, TransactionFragment.newInstance(bookInfo)).commit();
             }
@@ -147,7 +158,7 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
         float touchY = motionEvent.getY();
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
             for (Seat seat : seats) {
-                if(seat.isSelectable()){
+                if (seat.isSelectable()) {
                     if (seat.getRectangle().contains(touchX, touchY)) {
                         if (!seat.isSelected()) {
                             selectSeat(seat);
@@ -159,34 +170,6 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
             }
         }
         return true;
-    }
-
-    private void deselectSeat(Seat seat) {
-        seat.setSelected(false);
-        Paint paint2 = new Paint();
-        paint2.setColor(Color.WHITE);
-
-        RectF seatRect = seat.getRectangle();
-        mCanvas.drawRect(seatRect, paint2);
-        mCanvas.drawRect(seatRect, paint);
-        mCanvas.drawText(seat.getNumber(), seatRect.centerX(), seatRect.centerY(), paint);
-        ivCanvas.invalidate();
-    }
-
-    private void selectSeat(Seat seat) {
-        seat.setSelected(true);
-        Paint paint2 = new Paint();
-        paint2.setColor(Color.parseColor("#fff2cc"));
-
-        RectF seatRect = seat.getRectangle();
-        mCanvas.drawRect(seatRect, paint2);
-
-        paint2.setColor(Color.parseColor("#f3e1aa"));
-        paint2.setStyle(Paint.Style.STROKE);
-        paint2.setStrokeWidth(maxWidth*0.005f);
-        mCanvas.drawRect(seatRect, paint2);
-        mCanvas.drawText(seat.getNumber(), seatRect.centerX(), seatRect.centerY(), paint);
-        ivCanvas.invalidate();
     }
 
     @Override
@@ -205,12 +188,11 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
             bookInfo.put("course_id", obj.getString("course_id"));
             JSONArray arr = new JSONArray(obj.getString("seats"));
             String occupied = "";
-            for(int i = 0; i < arr.length(); i++){
-                if(i==0){
-                    occupied+=arr.get(i);
-                }
-                else{
-                    occupied+=","+arr.get(i);
+            for (int i = 0; i < arr.length(); i++) {
+                if (i == 0) {
+                    occupied += arr.get(i);
+                } else {
+                    occupied += "," + arr.get(i);
                 }
             }
             bookInfo.put("occupied", occupied);
@@ -226,10 +208,27 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, ErrorFragment.newInstance(error)).commit();
     }
+
+    private void saveBookedSeats() {
+        String tripKey = BookedSeatsManager.generateTripKey(source, destination, date, time, vehicleSize);
+        if (bookInfo.containsKey("seats")) {
+            String[] seatsArray = bookInfo.get("seats").split(",");
+            for (String seat : seatsArray) {
+                occupied.add(seat);
+            }
+        }
+        BookedSeatsManager.saveBookedSeats(getContext(), tripKey, occupied);
+    }
+
+    private void loadBookedSeats() {
+        String tripKey = BookedSeatsManager.generateTripKey(source, destination, date, time, vehicleSize);
+        occupied = BookedSeatsManager.loadBookedSeats(getContext(), tripKey);
+    }
+
     public void drawCanvas(){
         maxWidth = ivCanvas.getMeasuredWidth();
         maxHeight = ivCanvas.getMeasuredHeight();
-        mBitmap = Bitmap.createBitmap(maxWidth,maxHeight,Bitmap.Config.ARGB_8888);
+        mBitmap = Bitmap.createBitmap(maxWidth, maxHeight, Bitmap.Config.ARGB_8888);
         ivCanvas.setImageBitmap(mBitmap);
 
         mCanvas = new Canvas(mBitmap);
@@ -238,10 +237,12 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(maxWidth*0.005f);
         paint.setColor(Color.BLACK);
+        paint.setTextSize(maxWidth * 0.04f); // Set text size to match original
 
         Paint paint2 = new Paint();
-        paint2.setColor(Color.parseColor("#f8cecc"));
+        paint2.setColor(Color.parseColor("#f8cecc"));  // Set to the color from original code
 
+        // Ensure to draw the seats as occupied if they are in the bookedSeats set
         RectF first = new RectF(maxWidth*0.20f, maxHeight*0.05f, maxWidth*0.35f, maxHeight*0.20f);
         Seat one = null;
         if (occupied.contains("1")){
@@ -252,7 +253,6 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
             one = new Seat("1", first);
         }
         mCanvas.drawRect(first, paint);
-        paint.setTextSize(first.width()*0.5f);
         mCanvas.drawText("1", first.centerX(), first.centerY(), paint);
 
         RectF second = new RectF(maxWidth*0.65f, maxHeight*0.05f, maxWidth*0.80f, maxHeight*0.20f);
@@ -322,5 +322,37 @@ public class SmallSeatFragment extends Fragment implements View.OnClickListener,
         seats.add(four);
         seats.add(five);
         seats.add(six);
+    }
+
+    public void selectSeat(Seat seat) {
+        seat.setSelected(true);
+        Paint paint2 = new Paint();
+        paint2.setColor(Color.parseColor("#fff2cc"));  // Set background color to yellow
+
+        RectF seatRect = seat.getRectangle();
+        mCanvas.drawRect(seatRect, paint2);
+
+        paint2.setColor(Color.parseColor("#f3e1aa"));  // Set border color to light yellow
+        paint2.setStyle(Paint.Style.STROKE);
+        paint2.setStrokeWidth(maxWidth * 0.005f);
+        mCanvas.drawRect(seatRect, paint2);
+
+        mCanvas.drawText(seat.getNumber(), seatRect.centerX(), seatRect.centerY(), paint);
+
+        ivCanvas.invalidate();
+    }
+
+    public void deselectSeat(Seat seat) {
+        seat.setSelected(false);
+        Paint paint2 = new Paint();
+        paint2.setColor(Color.WHITE);
+
+        RectF seatRect = seat.getRectangle();
+        mCanvas.drawRect(seatRect, paint2);
+        mCanvas.drawRect(seatRect, paint);
+
+        mCanvas.drawText(seat.getNumber(), seatRect.centerX(), seatRect.centerY(), paint);
+
+        ivCanvas.invalidate();
     }
 }

@@ -1,45 +1,36 @@
 package com.example.pppb51_tubes02_b_f;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkCapabilities;
-import android.os.Build;
+import android.util.Log;
 
-import androidx.annotation.RequiresApi;
-
+import org.json.JSONArray;
 import org.json.JSONException;
 
 public class ControlPresenter {
-    private IMultipleRequest connectFragment;
+    private static final String TAG = "ControlPresenter";
     private IControlActivity ui;
+    private IMultipleRequest connectFragment;
 
-    public ControlPresenter(IMultipleRequest connectFragment, IControlActivity ui){
-        this.connectFragment = connectFragment;
+    public ControlPresenter(IControlActivity ui, IMultipleRequest connectFragment) {
         this.ui = ui;
+        this.connectFragment = connectFragment;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void getRoutes(Context context){
-        //Check if network is available
-        ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkCapabilities networkInfo = connMgr.getNetworkCapabilities(connMgr.getActiveNetwork());
-        if(networkInfo != null){
-            GetRoutesAPI worker = new GetRoutesAPI(connectFragment, context);
-            worker.execute();
-        } else { //no network
-            ui.showErrorPage("No Network Connection Available :(");
-        }
+    public void getRoutes(Context context) {
+        // Use the modified GetRoutesAPI with mock data
+        GetRoutesAPI api = new GetRoutesAPI(connectFragment, context);
+        api.execute();
     }
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void getOrders(Context context) throws JSONException {
-        //Check if network is available
-        ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkCapabilities networkInfo = connMgr.getNetworkCapabilities(connMgr.getActiveNetwork());
-        if(networkInfo != null){
-            GetOrdersAPI worker = new GetOrdersAPI(connectFragment, context);
-            worker.execute();
-        } else { //no network
-            ui.showErrorPage("No Network Connection Available :(");
+
+    public void getOrders(Context context) {
+        // Mock data for orders
+        String mockOrdersJson = "[{\"orderId\":\"order_1\",\"details\":\"Order details 1\"},{\"orderId\":\"order_2\",\"details\":\"Order details 2\"}]";
+        try {
+            JSONArray ordersArray = new JSONArray(mockOrdersJson);
+            connectFragment.onResponse(ordersArray.toString(), "getorders");
+        } catch (JSONException e) {
+            Log.e(TAG, "JSONException in getOrders: " + e.getMessage());
+            connectFragment.onError(e.getMessage());
         }
     }
 }

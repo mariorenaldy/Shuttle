@@ -20,17 +20,13 @@ public class LoginPresenter {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void authenticate(Context context, String username, String password){
-        //Check if network is available
+        // Check if network is available
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkCapabilities networkInfo = connMgr.getNetworkCapabilities(connMgr.getActiveNetwork());
         if(networkInfo != null){
             ui.setError("");
             AuthenticateAPI worker = new AuthenticateAPI(connectFragment, context);
-            try {
-                worker.execute(username, password);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            worker.execute(username, password);
         }
         else{
             ui.setError("No network connection available.");

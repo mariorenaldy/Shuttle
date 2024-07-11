@@ -1,27 +1,37 @@
 package com.example.pppb51_tubes02_b_f;
 
 public class OrderInput {
-    private String course_id;
-    private String seats;
+    private String source;
+    private String destination;
+    private String vehicle;
+    private String date;
+    private String hour;
 
-    public OrderInput(String course_id, String seats) {
-        this.course_id = course_id;
-        this.seats = seats;
+    public OrderInput(String source, String destination, String vehicle, String date, String hour) {
+        this.source = source;
+        this.destination = destination;
+        this.vehicle = vehicle;
+        this.date = date;
+        this.hour = hour;
     }
 
-    public String getCourse_id() {
-        return course_id;
+    public String getSource() {
+        return source;
     }
 
-    public void setCourse_id(String course_id) {
-        this.course_id = course_id;
+    public String getDestination() {
+        return destination;
     }
 
-    public String getSeats() {
-        return seats;
+    public String getVehicle() {
+        return vehicle;
     }
 
-    public void setSeats(String seats) {
-        this.seats = seats;
+    public String getDate() {
+        return date;
+    }
+
+    public String getHour() {
+        return hour;
     }
 }
