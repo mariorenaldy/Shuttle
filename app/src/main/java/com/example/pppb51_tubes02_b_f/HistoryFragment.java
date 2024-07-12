@@ -30,19 +30,13 @@ public class HistoryFragment extends Fragment {
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         navigationView.getMenu().getItem(2).setChecked(true);
 
-        Bundle args = getArguments();
-        if (args != null){
-            String response = args.getString("response");
-            JSONArray json = null;
-            try {
-                json = new JSONArray(response);
-                addHistoryItems(json);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+        // Fetch orders from TransactionPresenter
+        JSONArray orders = new JSONArray(TransactionPresenter.getOrders());
+        addHistoryItems(orders);
+
         return binding.getRoot();
     }
+
     public static HistoryFragment newInstance(String response) {
         HistoryFragment fragment = new HistoryFragment();
         Bundle args = new Bundle();
@@ -50,24 +44,24 @@ public class HistoryFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    public void addHistoryItems(JSONArray json){
+
+    public void addHistoryItems(JSONArray json) {
         TextView item = binding.item;
+        item.setText(""); // Clear previous items
 
         for (int i = 0; i < json.length(); i++) {
-            JSONObject obj = null;
-            String source = "";
-            String destination = "";
-            String datetime = "";
             try {
-                obj = json.getJSONObject(i);
-                source = obj.getString("source");
-                destination = obj.getString("destination");
-                datetime = obj.getString("course_datetime");
+                JSONObject obj = json.getJSONObject(i);
+                String source = obj.getString("source");
+                String destination = obj.getString("destination");
+                String datetime = obj.getString("course_datetime");
+                String vehicle = obj.getString("vehicle");
+                String seats = obj.getString("seats");
+
+                item.append(source + " - " + destination + "  " + datetime + " " + vehicle + " " + seats + "\n");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            item.setText(item.getText()+source+" - "+destination+"  "+datetime+"\n");
         }
     }
 }
